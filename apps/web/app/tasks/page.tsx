@@ -2,8 +2,10 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Plus, LogOut, BookOpen, Calendar, CheckCircle2 } from "lucide-react";
+import { Trash2, Plus, LogOut, BookOpen, Calendar as CalendarIcon, CheckCircle2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 import {
   Course,
@@ -28,6 +30,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function TasksPage() {
   const router = useRouter();
@@ -243,14 +251,28 @@ export default function TasksPage() {
                     className="rounded-full"
                   />
                   <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        value={submissionDueDate}
-                        onChange={(e) => setSubmissionDueDate(e.target.value)}
-                        type="date"
-                        className="w-full rounded-full"
-                      />
-                    </div>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal rounded-full",
+                            !submissionDueDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {submissionDueDate ? format(new Date(submissionDueDate), "PPP") : <span>Pick a due date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 rounded-3xl" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={submissionDueDate ? new Date(submissionDueDate) : undefined}
+                          onSelect={(date) => setSubmissionDueDate(date ? date.toISOString() : "")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <Button disabled={busy || !submissionTitle.trim()} onClick={() => onCreateTask("submission")} className="shrink-0 px-6 rounded-full">
                       Add
                     </Button>
@@ -319,9 +341,9 @@ function TaskList({
               </label>
               {task.section === "submission" && task.dueDate && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                  <Calendar className="h-3 w-3" />
+                  <CalendarIcon className="h-3 w-3" />
                   <span className={task.done ? "" : "font-medium text-orange-600 dark:text-orange-400"}>
-                    Due {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    Due {format(new Date(task.dueDate), "MMM d")}
                   </span>
                 </div>
               )}
