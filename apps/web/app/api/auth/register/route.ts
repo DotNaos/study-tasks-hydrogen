@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 
-import { setSessionCookie } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 function badRequest(message: string, status = 400) {
@@ -38,7 +37,6 @@ export async function POST(request: Request) {
       },
     });
 
-    await setSessionCookie(user.id);
     return Response.json(user, { status: 201 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
