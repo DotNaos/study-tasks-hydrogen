@@ -1,5 +1,3 @@
-import { TaskSection } from "@prisma/client";
-
 import { getSessionUserId } from "@/lib/auth";
 import { toTaskDto } from "@/lib/apiDtos";
 import { prisma } from "@/lib/prisma";
@@ -26,7 +24,8 @@ export async function GET(_request: Request, { params }: { params: Promise<Param
       id: true,
       courseId: true,
       title: true,
-      section: true,
+      description: true,
+      tag: true,
       dueDate: true,
       done: true,
     },
@@ -57,15 +56,18 @@ export async function POST(request: Request, { params }: { params: Promise<Param
 
   const body = await request.json().catch(() => null);
   const title = typeof body?.title === "string" ? body.title.trim() : "";
-  const section = body?.section;
+  const descriptionRaw = typeof body?.description === "string" ? body.description.trim() : "";
+  const description = descriptionRaw ? descriptionRaw : null;
+  const tagRaw = typeof body?.tag === "string" ? body.tag.trim() : "";
+  const tag = tagRaw || "general";
   const dueDate = typeof body?.dueDate === "string" ? body.dueDate : null;
 
   if (!title) {
     return new Response("Task title is required", { status: 400 });
   }
 
-  if (section !== "homework" && section !== "submission") {
-    return new Response("Invalid task section", { status: 400 });
+  if (!tag) {
+    return new Response("Task tag is required", { status: 400 });
   }
 
   const task = await prisma.task.create({
@@ -73,14 +75,16 @@ export async function POST(request: Request, { params }: { params: Promise<Param
       userId,
       courseId,
       title,
-      section: section as TaskSection,
-      dueDate: section === "submission" && dueDate ? new Date(dueDate) : null,
+      description,
+      tag,
+      dueDate: dueDate ? new Date(dueDate) : null,
     },
     select: {
       id: true,
       courseId: true,
       title: true,
-      section: true,
+      description: true,
+      tag: true,
       dueDate: true,
       done: true,
     },

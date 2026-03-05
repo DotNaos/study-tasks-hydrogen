@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
@@ -39,7 +38,7 @@ export async function POST(request: Request) {
 
     return Response.json(user, { status: 201 });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === "P2002") {
       return badRequest("Email already exists", 409);
     }
     return badRequest("Failed to register", 500);

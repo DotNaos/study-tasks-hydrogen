@@ -1,0 +1,13 @@
+Was wir jetzt noch brauchen, ist github pipelines aufsetzten, damit das ganze auf einen vps deployed wird.
+
+Wir brauchen zwei instanzen,
+
+einmal staging und einmal stable.
+
+Verwende die github cli um die secrets zu konfigurieren.
+
+Wenn du das ssh für meinen vps brauchst, einfach sagen.
+
+Du musst traefik konfigurieren, weil auf dem server laufen noch andere apps, damit es isoliert läuft.
+
+Docker compose brauchen wir auch.

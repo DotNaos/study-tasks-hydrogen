@@ -28,6 +28,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<Para
 
   const body = await request.json().catch(() => null);
   const title = typeof body?.title === "string" ? body.title.trim() : undefined;
+  const description =
+    body?.description === null
+      ? null
+      : typeof body?.description === "string"
+        ? body.description.trim() || null
+        : undefined;
+  const tag = typeof body?.tag === "string" ? body.tag.trim() : undefined;
   const done = typeof body?.done === "boolean" ? body.done : undefined;
   const dueDate = typeof body?.dueDate === "string" ? body.dueDate : body?.dueDate === null ? null : undefined;
 
@@ -35,6 +42,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<Para
     where: { id: taskId },
     data: {
       ...(title !== undefined ? { title } : {}),
+      ...(description !== undefined ? { description } : {}),
+      ...(tag !== undefined && tag.length > 0 ? { tag } : {}),
       ...(done !== undefined ? { done } : {}),
       ...(dueDate !== undefined
         ? {
@@ -46,7 +55,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<Para
       id: true,
       courseId: true,
       title: true,
-      section: true,
+      description: true,
+      tag: true,
       dueDate: true,
       done: true,
     },

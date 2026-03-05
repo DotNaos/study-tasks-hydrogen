@@ -3,13 +3,12 @@ export type Course = {
   name: string;
 };
 
-export type TaskSection = "homework" | "submission";
-
 export type Task = {
   id: string;
   courseId: string;
   title: string;
-  section: TaskSection;
+  description: string | null;
+  tag: string;
   dueDate: string | null;
   done: boolean;
 };
@@ -51,14 +50,20 @@ export function listTasks(courseId: string) {
   return apiFetch<Task[]>(`/courses/${courseId}/tasks`);
 }
 
-export function createTask(courseId: string, payload: { title: string; section: TaskSection; dueDate?: string | null }) {
+export function createTask(
+  courseId: string,
+  payload: { title: string; description?: string | null; tag?: string; dueDate?: string | null },
+) {
   return apiFetch<Task>(`/courses/${courseId}/tasks`, {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export function updateTask(taskId: string, payload: { title?: string; done?: boolean; dueDate?: string | null }) {
+export function updateTask(
+  taskId: string,
+  payload: { title?: string; description?: string | null; tag?: string; done?: boolean; dueDate?: string | null },
+) {
   return apiFetch<Task>(`/tasks/${taskId}`, {
     method: "PATCH",
     body: JSON.stringify(payload),
